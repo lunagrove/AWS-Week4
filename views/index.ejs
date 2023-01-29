@@ -1,0 +1,99 @@
+<%let checked1 = "";
+  let checked2 = "";
+  let checked3 = ""; 
+  if (imageType === "") {
+    checked1 = "checked";
+  } 
+  if (imageType === "small") {
+    checked2 = "checked";
+  }
+  if (imageType === "grayscale") {
+    checked3 = "checked";
+  } %>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Image Upload</title>
+  <link rel="stylesheet" href="/styles/styles.css" />
+</head>
+
+<body>
+  <h2>Upload Images</h2>
+
+  <section class="choose-image">
+    <form action="/images/save" method="post" enctype="multipart/form-data">
+      <input id="input-image" type="file" name="image" accept="image/*" required>
+      <button class="browse-button" type="button" onclick="document.getElementById('input-image').click();">Browse Images</button>
+      <input type="text" name="description" placeholder="Description" required>
+      <button type="submit" name="submit">UPLOAD</button>
+
+      <img id="image-preview" src="" />
+    </form>
+  </section>
+  
+  <div class="wrapper">
+    <div class="sidebar">
+      <fieldset class="radiogroup">
+        <legend>Select image type to view:</legend>
+        <div>
+          <input type="radio" id="original" name="imagetype" <%=`${checked1}`%> value="" >
+          <label for="original">Original</label>
+        </div>
+        <div>
+          <input type="radio" id="small" name="imagetype" <%=`${checked2}`%> value="small" >
+          <label for="small">Thumbnail</label>
+        </div>
+        <div>
+          <input type="radio" id="grayscale" name="imagetype" <%=`${checked3}`%> value="grayscale" >
+          <label for="grayscale">Grayscale</label>
+        </div>
+      </fieldset>
+
+      <button class="refresh-button" id="refresh-button" type="button">Refresh Images</button>
+      
+    </div>
+    <section class="image-grid">
+      <% for (let i = 0; i < images.length; i++) { %>
+        <article> 
+            <div class="image-box">
+              <img src="<%=`${images[i].imageURL}` %>">
+            </div>
+            <div class="caption">
+              <p><%= images[i].description %></p> 
+              <p><%= images[i].imageDate %></p>
+              <a href="/images/delete/<%= images[i].id%>">
+                <button type="button" class="delete-button">Delete</button>
+              </a>
+            </div>
+          </article>
+      <% } %> 
+    </section>
+  </div>
+</body>
+<script>
+  const refresh = document.getElementById('refresh-button');
+  refresh.addEventListener("click", async e => {
+    e.preventDefault();
+  
+    const selection = document.getElementsByName('imagetype');
+    console.log(selection);
+    for(i = 0; i < selection.length; i++) {
+      if(selection[i].checked) {
+        var newUrl = 'http://localhost:8080/' + selection[i].value;
+        console.log(newUrl);
+        const response = await fetch(newUrl);
+
+        // Update the URL in the browser
+        history.pushState({}, "", newUrl);
+
+        window.location.replace(newUrl);
+        break;
+      }
+    }
+  })
+</script>
+</html>

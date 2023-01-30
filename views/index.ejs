@@ -79,18 +79,38 @@
   refresh.addEventListener("click", async e => {
     e.preventDefault();
   
+    var current_URL = window.location.href;
+
     const selection = document.getElementsByName('imagetype');
     console.log(selection);
     for(i = 0; i < selection.length; i++) {
       if(selection[i].checked) {
-        var newUrl = 'http://localhost:8080/' + selection[i].value;
-        console.log(newUrl);
-        const response = await fetch(newUrl);
+        var items = (current_URL.split('/'));
+        if (items[items.length-1] === "small" ||
+            items[items.length-1] === "grayscale") 
+        {
+            items.pop();
+            current_URL = items.join('/');
+        }
+        console.log(current_URL);
+        var new_URL = current_URL;
+        if (selection[i].value != "") {
+          if (current_URL.charAt(current_URL.length-1) != "/")
+          {
+            new_URL = current_URL + '/' + selection[i].value;
+          }
+          else
+          {
+            new_URL = current_URL + selection[i].value;
+          }
+        }
+        console.log(new_URL);
+        const response = await fetch(new_URL);
 
         // Update the URL in the browser
-        history.pushState({}, "", newUrl);
+        history.pushState({}, "", new_URL);
 
-        window.location.replace(newUrl);
+        window.location.replace(new_URL);
         break;
       }
     }
